@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Table(name = "event")
@@ -21,6 +22,7 @@ public class Event {
     private UUID id;
     private String title;
     private String description;
+    private Date date;
     private String imgUrl;
     private String eventUrl;
     private boolean remote;
