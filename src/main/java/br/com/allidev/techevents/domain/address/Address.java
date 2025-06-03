@@ -1,14 +1,16 @@
 package br.com.allidev.techevents.domain.address;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import br.com.allidev.techevents.domain.event.Event;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.UUID;
 
 @Table(name = "address")
 @Entity
+@Getter
+@Setter
 public class Address {
 
     @Id
@@ -16,4 +18,8 @@ public class Address {
     private UUID id;
     private String city;
     private String uf;
+
+    @OneToOne
+    @JoinColumn(name = "event_id")
+    private Event event;
 }

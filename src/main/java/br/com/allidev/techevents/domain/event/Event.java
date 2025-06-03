@@ -1,5 +1,6 @@
 package br.com.allidev.techevents.domain.event;
 
+import br.com.allidev.techevents.domain.address.Address;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,4 +27,7 @@ public class Event {
     private String imgUrl;
     private String eventUrl;
     private boolean remote;
+
+    @OneToOne(mappedBy = "event", cascade = CascadeType.ALL)
+    private Address address;
 }
