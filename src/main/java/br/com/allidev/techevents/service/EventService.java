@@ -1,6 +1,8 @@
 package br.com.allidev.techevents.service;
 
+import br.com.allidev.techevents.domain.coupon.Coupon;
 import br.com.allidev.techevents.domain.event.Event;
+import br.com.allidev.techevents.domain.event.EventDetailsDTO;
 import br.com.allidev.techevents.domain.event.EventRequestDTO;
 import br.com.allidev.techevents.domain.event.EventResponseDTO;
 import br.com.allidev.techevents.repository.EventRepository;
@@ -24,6 +26,7 @@ import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -40,6 +43,8 @@ public class EventService {
 
     @Autowired
     private AdressService adressService;
+    @Autowired
+    private CouponService couponService;
 
     public Event createEvent(EventRequestDTO data) {
         String imgUrl = null;
@@ -74,7 +79,8 @@ public class EventService {
                         event.getDate(),
                         event.getAddress() != null ? event.getAddress().getCity() : "",
                         event.getAddress() != null ? event.getAddress().getUf() : "",
-                        event.isRemote(), event.getEventUrl(),
+                        event.isRemote(),
+                        event.getEventUrl(),
                         event.getImgUrl()))
                 .stream().toList();
     }
@@ -123,8 +129,34 @@ public class EventService {
                         event.getDate(),
                         event.getAddress() != null ? event.getAddress().getCity() : "",
                         event.getAddress() != null ? event.getAddress().getUf() : "",
-                        event.isRemote(), event.getEventUrl(),
+                        event.isRemote(),
+                        event.getEventUrl(),
                         event.getImgUrl()))
                 .stream().toList();
+    }
+
+    public EventDetailsDTO getEventDetails(UUID eventId) {
+        Event event = this.repository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found"));
+
+        List<Coupon> coupons = couponService.consultCoupons(eventId, new Date());
+
+        List<EventDetailsDTO.CouponDTO> couponDTOs = coupons.stream()
+                .map(coupon -> new EventDetailsDTO.CouponDTO(
+                        coupon.getCode(),
+                        coupon.getDiscount(),
+                        coupon.getValid()))
+                .collect(Collectors.toList());
+
+        return new EventDetailsDTO(
+                event.getId(),
+                event.getTitle(),
+                event.getDescription(),
+                event.getDate(),
+                event.getAddress() != null ? event.getAddress().getCity() : "",
+                event.getAddress() != null ? event.getAddress().getUf() : "",
+                event.getEventUrl(),
+                event.getImgUrl(),
+                couponDTOs);
     }
 }
